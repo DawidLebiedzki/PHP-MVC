@@ -1,0 +1,12 @@
+{
+
+  "authors": [
+    {
+      "name": "DawidL",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "symfony/http-foundation": "^3.0"
+  }
+}
