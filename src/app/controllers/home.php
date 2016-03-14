@@ -1,4 +1,6 @@
 <?php
 
 
-echo __FILE__;
+echo $page;
+echo '</br>';
+echo $name;

@@ -1,12 +1,33 @@
 <?php
+require __DIR__ . '/../vendor/autoload.php';
 
-$controller = isset($_GET['controller']) ? $_GET['controller'] : 'home'; // Zmienna $controller lub domyslna wartosc
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing;
 
-$dir = __DIR__ . '/../src/app/controllers/'; // Wyswietla
+$request = Request::createFromGlobals();
+$routes = include __DIR__ . '/../src/app/routes.php';
 
-if(file_exists($dir . $controller . '.php')){
-    require $dir . $controller . '.php';
-}else{
-    header('HTTP/1.0 404 Not Founds');
-    echo '404';
+$context = new Routing\RequestContext();
+$context->fromRequest($request);
+$matcher = new Routing\Matcher\UrlMatcher($routes, $context); // Pierwszy parametr obikety z naszego pliku routes.php
+
+
+$response = new Response();
+
+try{
+	extract($matcher->match($request->getPathInfo()), EXTR_SKIP);
+
+	ob_start();
+	include sprintf(__DIR__. '/../src/app/controllers/%s.php'. $_route);
+	$response = new Response(ob_get_clean());
+
+}catch (Routing\Exception\RouteNotFoundException $e){
+	$response->setStatusCode(404);
+	$response->setContent($e->getMessage());
+}catch (Exception $e){
+	$response->setStatusCode(404);
+	$response->setContent($e->getMessage());
 }
+
+
